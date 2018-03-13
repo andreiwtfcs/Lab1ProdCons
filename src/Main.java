@@ -2,10 +2,15 @@ import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.Semaphore;
 
 public class Main {
 	public static LinkedList<String> criticalSection = new LinkedList<String>();
 	public static Lock lock = new ReentrantLock();
+	
+	public static Semaphore semFree = new Semaphore(1);
+	public static Semaphore semFull = new Semaphore(0);
+	
 
 	public static void main(String[] args) {
 		System.out.println("Insert Number Of Threads:");

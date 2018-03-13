@@ -1,3 +1,4 @@
+import java.util.concurrent.Semaphore;
 
 public class Producer extends Thread {
 
@@ -9,16 +10,25 @@ public class Producer extends Thread {
 
 	@Override
 	public void run() {
-		Main.lock.lock();
-		Main.criticalSection.add(name);
-		Main.lock.unlock();
-		try {
-			Thread.sleep(500);
+		while (!Thread.currentThread().isInterrupted()) {
+			//Main.lock.lock();
+			try {
+				Main.semFree.acquire();
+				Main.criticalSection.add(name);
+				Main.semFull.release();
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} 
 			
-		}catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-			
+			//Main.lock.unlock();
+			try {
+				Thread.sleep(1500);
+				
+			}catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}	
 	}
 
 }
