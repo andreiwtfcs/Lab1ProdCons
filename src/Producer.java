@@ -9,16 +9,34 @@ public class Producer extends Thread {
 
 	@Override
 	public void run() {
-		Main.lock.lock();
-		Main.criticalSection.add(name);
-		Main.lock.unlock();
-		try {
-			Thread.sleep(500);
+		while (true) {
 			
-		}catch (InterruptedException e) {
-			e.printStackTrace();
+			try {
+				Thread.sleep(500);
+
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
+			synchronized (Main.condProd) {
+				if (Main.criticalSection.size() == Main.nrThread) {
+	
+					try {
+						Main.condProd.wait();
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					
+				}
+			}
+			synchronized (Main.condCons) {
+				Main.criticalSection.add(name);
+				Main.condCons.notify();
+			}
+			
+
 		}
-			
 	}
 
 }

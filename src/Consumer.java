@@ -8,19 +8,34 @@ public class Consumer extends Thread {
 
 	@Override
 	public void run() {
-		if (!Main.criticalSection.isEmpty()) {
-			Main.lock.lock();
-			String removed = Main.criticalSection.removeFirst();
-			System.out.println(name + " has removed " + removed);
-			Main.lock.unlock();
-		}
-		
-		try {
+		while (true) {
+			
+			try {
 				Thread.sleep(500);
-				
-		}catch (InterruptedException e) {
-			e.printStackTrace();
+
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
+			synchronized (Main.condCons) {
+				if (Main.criticalSection.size() == 0) {
+					try {
+						Main.condCons.wait();
+	
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+	
+				}
+			}
+			 synchronized (Main.condProd){
+				if (Main.criticalSection.size() != 0)
+				{
+					String removed = Main.criticalSection.removeFirst();
+					System.out.println(name + " has removed " + removed);
+				}
+				Main.condProd.notify();
+			}
 		}
-		
 	}
 }
